@@ -9,12 +9,13 @@ type UserService struct {
 }
 
 func (service UserService) CreateUser(user *models.User) {
-	database.DB.AutoMigrate(&models.User{})
 	database.DB.Create(user)
 }
 
-func (service UserService) GetUserByID(id int) models.User {
+func (service UserService) GetUserByID(id int) *models.User {
 	var user models.User
-	database.DB.First(&user, id)
-	return user
+	if err := database.DB.First(&user, id).Error; err != nil {
+		return nil
+	}
+	return &user
 }
