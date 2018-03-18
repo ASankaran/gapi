@@ -4,8 +4,10 @@ import (
     "encoding/json"
     "net/http"
     "github.com/gorilla/mux"
+    "github.com/justinas/alice"
     "../services"
     "../models"
+    "../middleware"
     "strconv"
 )
 
@@ -16,9 +18,9 @@ type UserController struct {
 func (controller UserController) SetupRouter(route *mux.Route) {
     userRouter := route.Subrouter()
 
-    userRouter.HandleFunc("/", getCurrentUser).Methods("GET")
-    userRouter.HandleFunc("/{id}", getUser).Methods("GET")
-    userRouter.HandleFunc("/", createUser).Methods("POST")
+    userRouter.Handle("/", alice.New().ThenFunc(getCurrentUser)).Methods("GET")
+    userRouter.Handle("/{id}", alice.New().ThenFunc(getUser)).Methods("GET")
+    userRouter.Handle("/", alice.New(middleware.AuthMiddleware).ThenFunc(createUser)).Methods("POST")
 }
 
 func getCurrentUser(w http.ResponseWriter, r *http.Request) {
