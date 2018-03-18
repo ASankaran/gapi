@@ -2,7 +2,6 @@ package controllers
 
 import (
     "encoding/json"
-    "log"
     "net/http"
     "github.com/gorilla/mux"
     "../services"
@@ -20,8 +19,6 @@ func (controller UserController) SetupRouter(route *mux.Route) {
     userRouter.HandleFunc("/", getCurrentUser).Methods("GET")
     userRouter.HandleFunc("/{id}", getUser).Methods("GET")
     userRouter.HandleFunc("/", createUser).Methods("POST")
-
-    log.Fatal(http.ListenAndServe(":8000", userRouter))
 }
 
 func getCurrentUser(w http.ResponseWriter, r *http.Request) {

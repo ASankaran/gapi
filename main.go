@@ -5,12 +5,19 @@ import (
     "net/http"
     "./controllers"
     "./database"
+    "./middleware"
     "github.com/gorilla/mux"
+    "github.com/urfave/negroni"
 )
 
 func main() {
 	database.Migrate()
     router := mux.NewRouter()
     controllers.SetupRouter(router)
-    log.Fatal(http.ListenAndServe(":8000", router))
+
+    routerMiddlewre := negroni.Classic()
+    routerMiddlewre.Use(negroni.HandlerFunc(middleware.ContentTypeMiddleware))
+    routerMiddlewre.UseHandler(router)
+    
+    log.Fatal(http.ListenAndServe(":8000", routerMiddlewre))
 }
