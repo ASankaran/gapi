@@ -8,6 +8,8 @@ import (
     "../services"
     "../models"
     "../middleware"
+    "../requests"
+    "../responses"
     "strconv"
 )
 
@@ -18,13 +20,16 @@ type UserController struct {
 func (controller UserController) SetupRouter(route *mux.Route) {
     userRouter := route.Subrouter()
 
-    userRouter.Handle("/", alice.New().ThenFunc(getCurrentUser)).Methods("GET")
-    userRouter.Handle("/{id}", alice.New().ThenFunc(getUser)).Methods("GET")
-    userRouter.Handle("/", alice.New(middleware.AuthMiddleware).ThenFunc(createUser)).Methods("POST")
+    userRouter.Handle("/", alice.New(middleware.AuthMiddleware).ThenFunc(getCurrentUser)).Methods("GET")
+    userRouter.Handle("/{id}", alice.New(middleware.AuthMiddleware).ThenFunc(getUser)).Methods("GET")
+    userRouter.Handle("/", alice.New().ThenFunc(createUser)).Methods("POST")
+    userRouter.Handle("/login", alice.New().ThenFunc(loginUser)).Methods("POST")
 }
 
 func getCurrentUser(w http.ResponseWriter, r *http.Request) {
-	user := services.UserServices.GetUserByID(1)
+	token := r.Header.Get("Authorization")
+	id := services.AuthServices.GetUserID(token)
+	user := services.UserServices.GetUserByID(id)
 	json.NewEncoder(w).Encode(user)
 }
 
@@ -40,5 +45,17 @@ func createUser(w http.ResponseWriter, r *http.Request) {
 	var user models.User
 	json.NewDecoder(r.Body).Decode(&user)
 	services.UserServices.CreateUser(&user)
-	json.NewEncoder(w).Encode("User was created")
+	json.NewEncoder(w).Encode(user)
+}
+
+func loginUser(w http.ResponseWriter, r *http.Request) {
+	var request requests.Login
+	json.NewDecoder(r.Body).Decode(&request)
+	user := services.UserServices.GetUserByEmailPassword(request.Email, request.Password)
+	if user == nil {
+		json.NewEncoder(w).Encode(nil)
+		return
+	}
+	token := services.AuthServices.GenerateToken(user)
+	json.NewEncoder(w).Encode(responses.Token{Token: token})
 }

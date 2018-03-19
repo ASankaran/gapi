@@ -2,12 +2,14 @@ package middleware
 
 import (
     "net/http"
-    "fmt"
+    "../services"
 )
 
 func AuthMiddleware(next http.Handler) http.Handler {
     return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-    	fmt.Println("Hit auth middleware")
-        next.ServeHTTP(w, r)
+    	token := r.Header.Get("Authorization")
+    	if services.AuthServices.VerifyToken(token) {
+    		next.ServeHTTP(w, r)
+    	}
     })
 }
