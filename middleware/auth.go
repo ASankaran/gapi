@@ -3,6 +3,7 @@ package middleware
 import (
     "net/http"
     "../services"
+    "../errors"
 )
 
 func AuthMiddleware(next http.Handler) http.Handler {
@@ -10,6 +11,8 @@ func AuthMiddleware(next http.Handler) http.Handler {
     	token := r.Header.Get("Authorization")
     	if services.AuthServices.VerifyToken(token) {
     		next.ServeHTTP(w, r)
+    		return
     	}
+    	panic(errors.APIError{Status: 403, Message: "Invalid Authorization"})
     })
 }

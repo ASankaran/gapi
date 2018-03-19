@@ -14,6 +14,7 @@ func main() {
     router := mux.NewRouter()
     controllers.SetupRouter(router)
     
+    router.Use(middleware.ErrorMiddleware)
     router.Use(middleware.ContentTypeMiddleware)
     log.Fatal(http.ListenAndServe(":8000", router))
 }
