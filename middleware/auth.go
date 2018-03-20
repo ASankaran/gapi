@@ -13,6 +13,6 @@ func AuthMiddleware(next http.Handler) http.Handler {
     		next.ServeHTTP(w, r)
     		return
     	}
-    	panic(errors.APIError{Status: 403, Message: "Invalid Authorization"})
+    	panic(errors.UnauthorizedError("Bad auth token"))
     })
 }
