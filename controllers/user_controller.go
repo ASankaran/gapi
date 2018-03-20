@@ -30,6 +30,7 @@ func getCurrentUser(w http.ResponseWriter, r *http.Request) {
 	token := r.Header.Get("Authorization")
 	id := services.AuthServices.GetUserID(token)
 	user := services.UserServices.GetUserByID(id)
+	user.Password = ""
 	json.NewEncoder(w).Encode(user)
 }
 
@@ -37,6 +38,7 @@ func getUser(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	id, _ := strconv.Atoi(params["id"])
 	user := services.UserServices.GetUserByID(id)
+	user.Password = ""
 	json.NewEncoder(w).Encode(user)
 
 }
@@ -45,6 +47,7 @@ func createUser(w http.ResponseWriter, r *http.Request) {
 	var user models.User
 	json.NewDecoder(r.Body).Decode(&user)
 	services.UserServices.CreateUser(&user, "USER")
+	user.Password = ""
 	json.NewEncoder(w).Encode(user)
 }
 
