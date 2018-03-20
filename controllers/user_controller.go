@@ -52,10 +52,6 @@ func loginUser(w http.ResponseWriter, r *http.Request) {
 	var request requests.Login
 	json.NewDecoder(r.Body).Decode(&request)
 	user := services.UserServices.GetUserByEmailPassword(request.Email, request.Password)
-	if user == nil {
-		json.NewEncoder(w).Encode(nil)
-		return
-	}
 	token := services.AuthServices.GenerateToken(user)
 	json.NewEncoder(w).Encode(responses.Token{Token: token})
 }

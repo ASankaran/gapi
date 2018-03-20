@@ -4,6 +4,7 @@ import (
 	"time"
 	"fmt"
 	"../models"
+	"../errors"
 	jwt "github.com/dgrijalva/jwt-go"
 )
 
@@ -51,7 +52,7 @@ func (service AuthService) VerifyToken(token_string string) bool {
 
 func (service AuthService) GetUserID(token_string string) int {
 	if !service.VerifyToken(token_string) {
-		return -1;
+		panic(errors.UnprocessableError("Bad auth token"))
 	}
 
 	token, _ := jwt.Parse(token_string, func(token *jwt.Token) (interface{}, error) {
