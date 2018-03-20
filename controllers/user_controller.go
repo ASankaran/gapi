@@ -20,8 +20,8 @@ type UserController struct {
 func (controller UserController) SetupRouter(route *mux.Route) {
     userRouter := route.Subrouter()
 
-    userRouter.Handle("/", alice.New(middleware.AuthMiddleware).ThenFunc(getCurrentUser)).Methods("GET")
-    userRouter.Handle("/{id}", alice.New(middleware.AuthMiddleware).ThenFunc(getUser)).Methods("GET")
+    userRouter.Handle("/", alice.New(middleware.AuthMiddleware(services.AUTH_USER)).ThenFunc(getCurrentUser)).Methods("GET")
+    userRouter.Handle("/{id}", alice.New(middleware.AuthMiddleware(services.AUTH_ADMIN)).ThenFunc(getUser)).Methods("GET")
     userRouter.Handle("/", alice.New().ThenFunc(createUser)).Methods("POST")
     userRouter.Handle("/login", alice.New().ThenFunc(loginUser)).Methods("POST")
 }
@@ -44,7 +44,7 @@ func getUser(w http.ResponseWriter, r *http.Request) {
 func createUser(w http.ResponseWriter, r *http.Request) {
 	var user models.User
 	json.NewDecoder(r.Body).Decode(&user)
-	services.UserServices.CreateUser(&user)
+	services.UserServices.CreateUser(&user, "USER")
 	json.NewEncoder(w).Encode(user)
 }
 

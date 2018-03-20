@@ -5,11 +5,17 @@ import (
 	"fmt"
 	"../models"
 	"../errors"
+	"../database"
 	jwt "github.com/dgrijalva/jwt-go"
 )
 
 type AuthService struct {
 }
+
+const (
+	AUTH_ADMIN string = "ADMIN"
+	AUTH_USER string = "USER"
+)
 
 var secret []byte
 
@@ -65,4 +71,17 @@ func (service AuthService) GetUserID(token_string string) int {
 
 	claims, _ := token.Claims.(jwt.MapClaims)
 	return int(claims["id"].(float64))
+}
+
+func (service AuthService) HasRequiredAuth(id int, required string) bool {
+	var roles []models.UserRole
+	database.DB.Where(map[string]interface{}{"user_id": id}).Find(&roles)
+
+	for _, role := range roles {
+		if role.Role == required {
+			return true
+		}
+	}
+
+	return false
 }

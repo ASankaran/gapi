@@ -10,13 +10,18 @@ import (
 type UserService struct {
 }
 
-func (service UserService) CreateUser(user *models.User) {
+func (service UserService) CreateUser(user *models.User, role string) {
 	password, err := utils.Hash(user.Password)
 	if err != nil {
 		panic(errors.UnprocessableError("Could not create user"))
 	}
 	user.Password = password
 	database.DB.Create(user)
+
+	var user_role models.UserRole
+	user_role.Role = role
+	user_role.User = *user
+	database.DB.Create(&user_role)
 }
 
 func (service UserService) GetUserByID(id int) *models.User {
