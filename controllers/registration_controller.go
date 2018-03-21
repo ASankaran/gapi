@@ -51,20 +51,25 @@ func createAttendee(w http.ResponseWriter, r *http.Request) {
 	attendee.User = *user
 
 	services.RegistrationServices.CreateAttendee(&attendee)
+	services.StatsServices.IncrementRegistrationStats(attendee)
 	json.NewEncoder(w).Encode(attendee)
 }
 
 func updateAttendee(w http.ResponseWriter, r *http.Request) {
+	token := r.Header.Get("Authorization")
+	id := services.AuthServices.GetUserID(token)
+
+	old_attendee := services.RegistrationServices.GetAttendeeByID(id)
+	services.StatsServices.DecrementRegistrationStats(*old_attendee)
+
 	var attendee_registration requests.AttendeeRegistration
 	json.NewDecoder(r.Body).Decode(&attendee_registration)
 
 	attendee_update := attendee_registration.Attendee
 
-	token := r.Header.Get("Authorization")
-	id := services.AuthServices.GetUserID(token)
-
 	services.RegistrationServices.UpdateAttendee(&attendee_update, id)
 
 	attendee := services.RegistrationServices.GetAttendeeByID(id)
+	services.StatsServices.IncrementRegistrationStats(*attendee)
 	json.NewEncoder(w).Encode(attendee)
 }

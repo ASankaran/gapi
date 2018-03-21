@@ -12,7 +12,7 @@ type Attendee struct {
 	ShirtSize                 string                    `json:"shirtsize,omitempty"               sql:"not null;type:ENUM('S', 'M', 'L', 'XL')"`
 	Diet                      string                    `json:"diet,omitempty"                    sql:"not null;type:ENUM('NONE', 'VEGETARIAN', 'VEGAN', 'GLUTEN_FREE');default:'NONE'"`
 	Age                       int                       `json:"age,omitempty"                     sql:"not null"`
-	GraduateYear              int                       `json:"graduationyear,omitempty"          sql:"not null"`
+	GraduationYear            int                       `json:"graduationyear,omitempty"          sql:"not null"`
 	Transportation            string                    `json:"transportation,omitempty"          sql:"not null;type:ENUM('NOT_NEEDED', 'BUS_REQUESTED', 'IN_STATE', 'OUT_OF_STATE', 'INTERNATIONAL');default:'NOT_NEEDED'"`
 	School                    string                    `json:"school,omitempty"                  sql:"not null"`
 	Major                     string                    `json:"major,omitempty"                   sql:"not null"`

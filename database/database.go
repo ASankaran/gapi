@@ -15,4 +15,5 @@ func Migrate() {
 	DB.AutoMigrate(&models.AttendeeCollaborator{})
 	DB.AutoMigrate(&models.AttendeeLongForm{})
 	DB.AutoMigrate(&models.AttendeeExtraInfo{})
+	DB.AutoMigrate(&models.Stat{})
 }
