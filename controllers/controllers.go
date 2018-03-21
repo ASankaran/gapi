@@ -13,4 +13,6 @@ func SetupRouter(router *mux.Router) {
 	userController.SetupRouter(router.PathPrefix("/user"))
 	registrationController := RegistrationController{}
 	registrationController.SetupRouter(router.PathPrefix("/registration"))
+	statsController := StatsController{}
+	statsController.SetupRouter(router.PathPrefix("/stats"))
 }
