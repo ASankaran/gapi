@@ -21,6 +21,7 @@ func (controller RegistrationController) SetupRouter(route *mux.Route) {
     registrationRouter.Handle("/", alice.New(middleware.AuthMiddleware(services.AUTH_ATTENDEE)).ThenFunc(getCurrentAttendee)).Methods("GET")
     registrationRouter.Handle("/{id}", alice.New(middleware.AuthMiddleware(services.AUTH_ADMIN)).ThenFunc(getAttendee)).Methods("GET")
     registrationRouter.Handle("/", alice.New(middleware.AuthMiddleware(services.AUTH_USER)).ThenFunc(createAttendee)).Methods("POST")
+    registrationRouter.Handle("/", alice.New(middleware.AuthMiddleware(services.AUTH_ATTENDEE)).ThenFunc(updateAttendee)).Methods("PUT")
 }
 
 func getCurrentAttendee(w http.ResponseWriter, r *http.Request) {
@@ -50,5 +51,20 @@ func createAttendee(w http.ResponseWriter, r *http.Request) {
 	attendee.User = *user
 
 	services.RegistrationServices.CreateAttendee(&attendee)
+	json.NewEncoder(w).Encode(attendee)
+}
+
+func updateAttendee(w http.ResponseWriter, r *http.Request) {
+	var attendee_registration requests.AttendeeRegistration
+	json.NewDecoder(r.Body).Decode(&attendee_registration)
+
+	attendee_update := attendee_registration.Attendee
+
+	token := r.Header.Get("Authorization")
+	id := services.AuthServices.GetUserID(token)
+
+	services.RegistrationServices.UpdateAttendee(&attendee_update, id)
+
+	attendee := services.RegistrationServices.GetAttendeeByID(id)
 	json.NewEncoder(w).Encode(attendee)
 }
