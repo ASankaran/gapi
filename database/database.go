@@ -12,4 +12,5 @@ func Migrate() {
 	DB.AutoMigrate(&models.User{})
 	DB.AutoMigrate(&models.UserRole{})
 	DB.AutoMigrate(&models.Attendee{})
+	DB.AutoMigrate(&models.AttendeeCollaborator{})
 }

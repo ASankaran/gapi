@@ -23,5 +23,6 @@ func (service RegistrationService) GetAttendeeByID(id int) *models.Attendee {
 	if err := database.DB.Where(map[string]interface{}{"user_id": id}).First(&attendee).Error; err != nil {
 		panic(errors.UnprocessableError("No matching id found"))
 	}
+	database.DB.Preload("Collaborators").Find(&attendee)
 	return &attendee
 }
