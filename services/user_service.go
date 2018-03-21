@@ -16,7 +16,9 @@ func (service UserService) CreateUser(user *models.User, role string) {
 		panic(errors.UnprocessableError("Could not create user"))
 	}
 	user.Password = password
-	database.DB.Create(user)
+	if err := database.DB.Create(user).Error; err != nil {
+		panic(errors.UnprocessableError("Could not create user"))
+	}
 
 	var user_role models.UserRole
 	user_role.Role = role

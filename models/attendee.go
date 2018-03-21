@@ -7,8 +7,8 @@ import (
 
 type Attendee struct {
 	gorm.Model
-	User                      User       `gorm:"foreignkey:UserID"`
-	UserID                    int
+	User                      User       `json:"-"                                 gorm:"foreignkey:UserID"`
+	UserID                    int        `json:"userid,omitempty"                  sql:"not null;unique"`
 	ShirtSize                 string     `json:"shirtsize,omitempty"               sql:"not null;type:ENUM('S', 'M', 'L', 'XL')"`
 	Diet                      string     `json:"diet,omitempty"                    sql:"not null;type:ENUM('NONE', 'VEGETARIAN', 'VEGAN', 'GLUTEN_FREE');default:'NONE'"`
 	Age                       int        `json:"age,omitempty"                     sql:"not null"`

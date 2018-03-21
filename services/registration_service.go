@@ -10,7 +10,9 @@ type RegistrationService struct {
 }
 
 func (service RegistrationService) CreateAttendee(attendee *models.Attendee) {
-	database.DB.Create(attendee)
+	if err := database.DB.Create(attendee).Error; err != nil {
+		panic(errors.UnprocessableError("Could not register attendee"))
+	}
 
 	user := UserServices.GetUserByID(attendee.UserID)
 	UserServices.AddUserRole(user, "ATTENDEE")
