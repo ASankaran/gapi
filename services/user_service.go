@@ -16,14 +16,28 @@ func (service UserService) CreateUser(user *models.User, role string) {
 		panic(errors.UnprocessableError("Could not create user"))
 	}
 	user.Password = password
-	if err := database.DB.Create(user).Error; err != nil {
+
+	tx := database.DB.Begin()
+	if tx.Error != nil {
+		panic(errors.UnprocessableError("Could not create user"))
+	}
+
+	if err := tx.Create(user).Error; err != nil {
+		tx.Rollback()
 		panic(errors.UnprocessableError("Could not create user"))
 	}
 
 	var user_role models.UserRole
 	user_role.Role = role
 	user_role.User = *user
-	database.DB.Create(&user_role)
+	if err := tx.Create(&user_role).Error; err != nil {
+		tx.Rollback()
+		panic(errors.UnprocessableError("Could not create user"))
+	}
+
+	if err := tx.Commit().Error; err != nil {
+		panic(errors.UnprocessableError("Could not create user"))
+	}
 }
 
 func (service UserService) GetUserByID(id int) *models.User {
@@ -43,11 +57,4 @@ func (service UserService) GetUserByEmailPassword(email string, password string)
 		panic(errors.UnprocessableError("No matching email and password found"))
 	}
 	return &user
-}
-
-func (service UserService) AddUserRole(user *models.User, role string) {
-	var user_role models.UserRole
-	user_role.Role = role
-	user_role.User = *user
-	database.DB.Create(&user_role)
 }

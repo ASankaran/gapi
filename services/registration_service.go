@@ -10,12 +10,28 @@ type RegistrationService struct {
 }
 
 func (service RegistrationService) CreateAttendee(attendee *models.Attendee) {
-	if err := database.DB.Create(attendee).Error; err != nil {
+	tx := database.DB.Begin()
+	if tx.Error != nil {
+		panic(errors.UnprocessableError("Could not register attendee"))
+	}
+
+	if err := tx.Create(attendee).Error; err != nil {
+		tx.Rollback()
 		panic(errors.UnprocessableError("Could not register attendee"))
 	}
 
 	user := UserServices.GetUserByID(attendee.UserID)
-	UserServices.AddUserRole(user, "ATTENDEE")
+	var user_role models.UserRole
+	user_role.Role = "ATTENDEE"
+	user_role.User = *user
+	if err := tx.Create(&user_role).Error; err != nil {
+		tx.Rollback()
+		panic(errors.UnprocessableError("Could not register attendee"))
+	}
+
+	if err := tx.Commit().Error; err != nil {
+		panic(errors.UnprocessableError("Could not register attendee"))
+	}
 }
 
 func (service RegistrationService) GetAttendeeByID(id int) *models.Attendee {
