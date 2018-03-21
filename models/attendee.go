@@ -31,4 +31,6 @@ type Attendee struct {
 	Reviewer                  string                    `json:"reviewer,omitempty"                sql:"null;default:null"`
 	ReviewTime                time.Time                 `json:"reviewertime,omitempty"            sql:"null;default:null"`
 	Collaborators             []AttendeeCollaborator    `json:"collaborators,omitempty"           sql:"null;default:null"`
+	LongForms                 []AttendeeLongForm        `json:"longforms,omitempty"               sql:"null;default:null"`
+	ExtraInfos                []AttendeeExtraInfo       `json:"extrainfos,omitempty"              sql:"null;default:null"`
 }

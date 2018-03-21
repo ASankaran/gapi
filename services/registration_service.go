@@ -24,5 +24,7 @@ func (service RegistrationService) GetAttendeeByID(id int) *models.Attendee {
 		panic(errors.UnprocessableError("No matching id found"))
 	}
 	database.DB.Preload("Collaborators").Find(&attendee)
+	database.DB.Preload("LongForms").Find(&attendee)
+	database.DB.Preload("ExtraInfos").Find(&attendee)
 	return &attendee
 }
