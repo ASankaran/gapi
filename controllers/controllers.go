@@ -11,4 +11,6 @@ type controller interface {
 func SetupRouter(router *mux.Router) {
 	userController := UserController{}
 	userController.SetupRouter(router.PathPrefix("/user"))
+	registrationController := RegistrationController{}
+	registrationController.SetupRouter(router.PathPrefix("/registration"))
 }

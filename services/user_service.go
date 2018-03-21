@@ -42,3 +42,10 @@ func (service UserService) GetUserByEmailPassword(email string, password string)
 	}
 	return &user
 }
+
+func (service UserService) AddUserRole(user *models.User, role string) {
+	var user_role models.UserRole
+	user_role.Role = role
+	user_role.User = *user
+	database.DB.Create(&user_role)
+}

@@ -14,6 +14,7 @@ type AuthService struct {
 
 const (
 	AUTH_ADMIN string = "ADMIN"
+	AUTH_ATTENDEE string = "ATTENDEE"
 	AUTH_USER string = "USER"
 )
 

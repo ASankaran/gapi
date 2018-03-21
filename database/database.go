@@ -11,4 +11,5 @@ var DB, _ = gorm.Open("mysql", "root:pass123@/gapi?charset=utf8&parseTime=True&l
 func Migrate() {
 	DB.AutoMigrate(&models.User{})
 	DB.AutoMigrate(&models.UserRole{})
+	DB.AutoMigrate(&models.Attendee{})
 }
