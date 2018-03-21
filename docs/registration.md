@@ -117,6 +117,25 @@ Response Body
 }
 ````
 
+**PUT /registration/**
+
+Register an attendee
+
+Headers
+
+| Header          | Description                  | Required  |
+| --------------- | ---------------------------- | --------- |
+| `Content-Type`  | application/json             | Yes       |
+| `Authorization` | a valid authentication token | Yes       |
+
+Request Body
+
+Same as POST /registration/
+
+Response Body
+
+Same as POST /registration/
+
 **GET /registration/**
 
 Get an logged in attendee
