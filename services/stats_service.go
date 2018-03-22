@@ -4,7 +4,9 @@ import (
 	"../models"
 	"../database"
 	"../responses"
+	"../cache"
 	"strconv"
+	"encoding/json"
 )
 
 type StatsService struct {
@@ -32,6 +34,11 @@ func (services StatsService) DecrementStat(category string, attribute string, fi
 	database.DB.Save(&stat)
 }
 
+func (service StatsService) writeBackToCache(key string, stats interface{}) {
+	stats_string, _ := json.Marshal(stats)
+	cache.WriteString(key, string(stats_string))
+}
+
 func (service StatsService) getStats(category string, attribute string) []models.Stat {
 	var stats []models.Stat
 	database.DB.Where(map[string]interface{}{"category": category, "attribute": attribute}).Find(&stats)
@@ -40,6 +47,12 @@ func (service StatsService) getStats(category string, attribute string) []models
 
 func (service StatsService) GetRegistrationStats() responses.RegistrationStats {
 	var registration_stats responses.RegistrationStats
+
+	if cache.KeyExists("STATS_REGISTRATION") {
+		json.Unmarshal([]byte(cache.GetString("STATS_REGISTRATION")), &registration_stats)
+		return registration_stats
+	}
+
 	registration_stats.School = StatsServices.getStats("REGISTRATION", "school")
 	registration_stats.Transportation = StatsServices.getStats("REGISTRATION", "transportation")
 	registration_stats.Diet = StatsServices.getStats("REGISTRATION", "diet")
@@ -50,6 +63,9 @@ func (service StatsService) GetRegistrationStats() responses.RegistrationStats {
 	registration_stats.Status = StatsServices.getStats("REGISTRATION", "status")
 	registration_stats.Major = StatsServices.getStats("REGISTRATION", "major")
 	registration_stats.Attendees = StatsServices.getStats("REGISTRATION", "attendees")
+
+	StatsServices.writeBackToCache("STATS_REGISTRATION", registration_stats)
+
 	return registration_stats
 }
 
@@ -68,6 +84,8 @@ func (services StatsService) IncrementRegistrationStats(attendee models.Attendee
 	StatsServices.IncrementStat("REGISTRATION", "status", attendee.Status)
 	StatsServices.IncrementStat("REGISTRATION", "major", attendee.Major)
 	StatsServices.IncrementStat("REGISTRATION", "attendees", "count")
+
+	cache.DeleteString("STATS_REGISTRATION")
 }
 
 func (services StatsService) DecrementRegistrationStats(attendee models.Attendee) {
@@ -85,4 +103,6 @@ func (services StatsService) DecrementRegistrationStats(attendee models.Attendee
 	StatsServices.DecrementStat("REGISTRATION", "status", attendee.Status)
 	StatsServices.DecrementStat("REGISTRATION", "major", attendee.Major)
 	StatsServices.DecrementStat("REGISTRATION", "attendees", "count")
+
+	cache.DeleteString("STATS_REGISTRATION")
 }
